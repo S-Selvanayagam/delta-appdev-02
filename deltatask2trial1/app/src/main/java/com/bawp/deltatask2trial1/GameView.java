@@ -1,5 +1,7 @@
 package com.bawp.deltatask2trial1;
 
+import static com.bawp.deltatask2trial1.MainThread.canvas;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,9 +11,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -31,17 +35,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public static int velocity = 10;
     public PipeSprite pipe1, pipe2, pipe3;
     public int highscore = 0;
+    private SurfaceHolder holder;
     private CountDownTimer mCountDownTimer;
     private boolean mTimerRunning;
     private static final long START_TIME_IN_MILLIS = 600000;
     private long mTimeLeftInMillis = START_TIME_IN_MILLIS;
+    public String text = "";
+    public String text1 = "";
+    public String text2 = "";
+    public String text4 = "";
+
 
 
 
     private int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
     private int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     private int score;
-
+    private int highScore;
+    private int state;
 
 
     public GameView(Context context) {
@@ -175,16 +186,62 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     {
 
         super.draw(canvas);
-        if(canvas!=null) {
+        if (state == 0) {
             canvas.drawColor(Color.WHITE);
             characterSprite.draw(canvas);
             pipe1.draw(canvas);
             pipe2.draw(canvas);
             pipe3.draw(canvas);
 
-        }
-    }
 
+
+            Paint paint = new Paint();
+            canvas.drawText(text, 100, 100, paint);
+            paint.setTextSize(200);
+            canvas.drawText(text1, 600, 420, paint);
+            paint.setTextSize(50);
+            canvas.drawText(text2, 750, 520, paint);
+            paint.setTextSize(100);
+            canvas.drawText(text4, 1450, 100, paint);
+        }
+        else if(canvas!=null) {
+            canvas.drawColor(Color.WHITE);
+            characterSprite.draw(canvas);
+            pipe1.draw(canvas);
+            pipe2.draw(canvas);
+            pipe3.draw(canvas);
+
+
+
+            Paint paint = new Paint();
+            canvas.drawText(text, 100, 100, paint);
+            paint.setTextSize(200);
+            canvas.drawText(text1, 600, 420, paint);
+            paint.setTextSize(50);
+            canvas.drawText(text2, 750, 520, paint);
+            paint.setTextSize(100);
+            canvas.drawText(text4, 1450, 100, paint);
+
+
+        }
+
+    }
+    public void gameover(){
+        Log.i("game over execution","s");
+        state = 0;
+        if (score > highScore){
+            highScore = score;
+        }
+        thread.setRunning(false);
+        text = " High Score = " + String.valueOf(highScore);
+        text1 = "GAME OVER";
+        text2 = "Play Again";
+        text4 = "Score = " + String.valueOf(score);
+        draw(canvas);
+
+
+
+    }
     public void logic(View view) {
 
         List<PipeSprite> pipes = new ArrayList<>();
@@ -195,15 +252,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         for (int i = 0; i < pipes.size(); i++) {
             //Detect if the ball is touching one of the spikes
             if (characterSprite.y < pipes.get(i).yY + (screenHeight / 2) - (gapHeight / 2) && characterSprite.x + 300 > pipes.get(i).xX && characterSprite.x < pipes.get(i).xX + 500) {
-                Intent i1 = new Intent(view.getContext(), scorepage.class);
-                view.getContext().startActivity(i1);
+               gameover();
                // resetLevel(null);
                 
 
             }
             else if (characterSprite.y + 240 > (screenHeight / 2) + (gapHeight / 2) + pipes.get(i).yY && characterSprite.x + 300 > pipes.get(i).xX && characterSprite.x < pipes.get(i).xX + 500) {
-                Intent i1 = new Intent(view.getContext(), scorepage.class);
-                view.getContext().startActivity(i1);
+               gameover();
                 //resetLevel(null);
             }
             else{
