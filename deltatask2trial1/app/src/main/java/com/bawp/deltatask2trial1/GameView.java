@@ -43,16 +43,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public String text = "";
     public String text1 = "";
     public String text2 = "";
-    public String text4 = "";
+    private int score;
+    public String text4 = "" ;
 
 
 
 
     private int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
     private int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
-    private int score;
+
     private int highScore;
-    private int state;
+    private int state=1;
 
 
     public GameView(Context context) {
@@ -67,9 +68,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    public void resetLevel(View view) {
+    public void resetLevel() {
         Log.i("info"," im here");
-
         Log.i("info"," im here2");
         characterSprite.y = 100;
         pipe1.xX = 2000;
@@ -78,8 +78,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         pipe2.yY = 200;
         pipe3.xX = 3200;
         pipe3.yY = 250;
-
-
+        thread.setRunning(true);
+        Log.i("in", "I excetu");
     }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
@@ -107,8 +107,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
+        if (state == 0 && (event.getX() > 700 && event.getX() < 1500) && (event.getY() > 700 && event.getY() < 850) ){
+            Log.i("ola",String.valueOf(event.getX()));
+            Log.i("olla",String.valueOf(event.getY()));
+            Log.i("state", String.valueOf(state));
+            resetLevel();
+            Log.i("infome",String.valueOf(thread.isAlive()));
+            thread.setRunning(true);
+            Log.i("infome",String.valueOf(thread.isAlive()));
+
+        }
         characterSprite.y = characterSprite.y - (characterSprite.yVelocity * 10);
         return super.onTouchEvent(event);
+
+
     }
 
 
@@ -198,11 +210,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             Paint paint = new Paint();
             canvas.drawText(text, 100, 100, paint);
             paint.setTextSize(200);
-            canvas.drawText(text1, 600, 420, paint);
-            paint.setTextSize(50);
-            canvas.drawText(text2, 750, 520, paint);
+            canvas.drawText(text1, 700, 750, paint);
             paint.setTextSize(100);
-            canvas.drawText(text4, 1450, 100, paint);
+            canvas.drawText(text2, 1000, 920, paint);
+            paint.setColor(Color.BLUE);
+
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(100);
+            canvas.drawText(text4, 2250, 100, paint);
         }
         else if(canvas!=null) {
             canvas.drawColor(Color.WHITE);
@@ -216,12 +231,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             Paint paint = new Paint();
             canvas.drawText(text, 100, 100, paint);
             paint.setTextSize(200);
-            canvas.drawText(text1, 600, 420, paint);
-            paint.setTextSize(50);
-            canvas.drawText(text2, 750, 520, paint);
+            canvas.drawText(text1, 700, 750, paint);
             paint.setTextSize(100);
-            canvas.drawText(text4, 1450, 100, paint);
-
+            canvas.drawText(text2, 1000, 970, paint);
+            paint.setTextSize(100);
+            canvas.drawRect(700, 850, 1500, 700, paint);
+            canvas.drawText(text4, 2250, 100, paint);
+            text4 = "Score = " + String.valueOf(score);
 
         }
 
@@ -232,15 +248,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         if (score > highScore){
             highScore = score;
         }
-        thread.setRunning(false);
+//        thread.setRunning(true);
         text = " High Score = " + String.valueOf(highScore);
         text1 = "GAME OVER";
         text2 = "Play Again";
         text4 = "Score = " + String.valueOf(score);
         draw(canvas);
-
-
-
+//        Object event = null;
+//        onTouchEvent1((MotionEvent) event);
     }
     public void logic(View view) {
 
@@ -253,16 +268,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             //Detect if the ball is touching one of the spikes
             if (characterSprite.y < pipes.get(i).yY + (screenHeight / 2) - (gapHeight / 2) && characterSprite.x + 300 > pipes.get(i).xX && characterSprite.x < pipes.get(i).xX + 500) {
                gameover();
+               thread.setRunning(false);
                // resetLevel(null);
                 
 
             }
             else if (characterSprite.y + 240 > (screenHeight / 2) + (gapHeight / 2) + pipes.get(i).yY && characterSprite.x + 300 > pipes.get(i).xX && characterSprite.x < pipes.get(i).xX + 500) {
                gameover();
+               thread.setRunning(false);
                 //resetLevel(null);
             }
             else{
-                  score+=100;
+                  score+=1;
                 }
 
 
@@ -278,13 +295,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         //Detect if the ball has gone off the bottom or top of the screen
         if (characterSprite.y + 240 < 0) {
-            resetLevel(null); }
+            resetLevel(); }
         if (characterSprite.y > screenHeight) {
-            resetLevel(null); }
+            resetLevel(); }
+    }
+    public boolean onTouchEvent1(MotionEvent event) {
+        Log.i("ola",String.valueOf(event.getX()));
+        Log.i("olla",String.valueOf(event.getY()));
+        if ((event.getX() > 700 && event.getX() < 1500) && (event.getY() > 700 && event.getY() < 850)) {
+            resetLevel();
+            thread.setRunning(true);
+
+        }
+        return super.onTouchEvent(event);
+    }
     }
 
 
 
 
 
-}
+
