@@ -33,7 +33,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private CharacterSprite characterSprite;
     public static int gapHeight = 500;
     public static int velocity = 10;
-    public PipeSprite pipe1, pipe2, pipe3;
+    public Obstaclesprite pipe1, pipe2, pipe3;
     public int highscore = 0;
     private SurfaceHolder holder;
     private CountDownTimer mCountDownTimer;
@@ -78,7 +78,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         pipe2.yY = 200;
         pipe3.xX = 3200;
         pipe3.yY = 250;
-        thread.setRunning(true);
+        thread.start();
         Log.i("in", "I excetu");
     }
 
@@ -113,7 +113,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             Log.i("state", String.valueOf(state));
             resetLevel();
             Log.i("infome",String.valueOf(thread.isAlive()));
-            thread.setRunning(true);
+
+            thread.start();
             Log.i("infome",String.valueOf(thread.isAlive()));
 
         }
@@ -164,9 +165,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         bmp2 = getResizedBitmap
                 (BitmapFactory.decodeResource(getResources(), R.drawable.spikedown), 500, Resources.getSystem().getDisplayMetrics().heightPixels / 2);
 
-        pipe1 = new PipeSprite(bmp, bmp2, 2000, 100);
-        pipe2 = new PipeSprite(bmp, bmp2, 4500, 100);
-        pipe3 = new PipeSprite(bmp, bmp2, 3200, 100);
+        pipe1 = new Obstaclesprite(bmp, bmp2, 2000, 100);
+        pipe2 = new Obstaclesprite(bmp, bmp2, 4500, 100);
+        pipe3 = new Obstaclesprite(bmp, bmp2, 3200, 100);
 
     }
     @Override
@@ -259,7 +260,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
     public void logic(View view) {
 
-        List<PipeSprite> pipes = new ArrayList<>();
+        List<Obstaclesprite> pipes = new ArrayList<>();
         pipes.add(pipe1);
         pipes.add(pipe2);
         pipes.add(pipe3);
@@ -268,14 +269,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             //Detect if the ball is touching one of the spikes
             if (characterSprite.y < pipes.get(i).yY + (screenHeight / 2) - (gapHeight / 2) && characterSprite.x + 300 > pipes.get(i).xX && characterSprite.x < pipes.get(i).xX + 500) {
                gameover();
-               thread.setRunning(false);
+               thread.interrupt();
                // resetLevel(null);
                 
 
             }
             else if (characterSprite.y + 240 > (screenHeight / 2) + (gapHeight / 2) + pipes.get(i).yY && characterSprite.x + 300 > pipes.get(i).xX && characterSprite.x < pipes.get(i).xX + 500) {
                gameover();
-               thread.setRunning(false);
+               thread.interrupt();
                 //resetLevel(null);
             }
             else{
@@ -295,16 +296,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         //Detect if the ball has gone off the bottom or top of the screen
         if (characterSprite.y + 240 < 0) {
-            resetLevel(); }
+            gameover();
+            thread.interrupt(); }
         if (characterSprite.y > screenHeight) {
-            resetLevel(); }
+            gameover();
+            thread.interrupt();}
     }
     public boolean onTouchEvent1(MotionEvent event) {
         Log.i("ola",String.valueOf(event.getX()));
         Log.i("olla",String.valueOf(event.getY()));
         if ((event.getX() > 700 && event.getX() < 1500) && (event.getY() > 700 && event.getY() < 850)) {
             resetLevel();
-            thread.setRunning(true);
+            thread.start();
 
         }
         return super.onTouchEvent(event);
